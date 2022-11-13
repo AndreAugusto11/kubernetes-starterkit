@@ -1,4 +1,4 @@
-FROM node:10.15.0-alpine
+FROM node:12
 
 # install simple http server for serving static content
 RUN npm install -g http-server
@@ -19,4 +19,7 @@ COPY . .
 RUN npm run build
 
 EXPOSE 2000
-CMD [ "http-server", "dist" , "-p 2000"]
+
+COPY ./docker-entrypoint.sh /docker-entrypoint.sh
+RUN chmod +x /docker-entrypoint.sh
+ENTRYPOINT ["/docker-entrypoint.sh"]

@@ -1,0 +1,54 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: happy-deployment
+  labels:
+    app: happy
+spec: #specification for the deployment
+  replicas: 1
+  selector:
+    matchLabels:
+      app: happy
+  template:
+    metadata:
+      labels:
+        app: happy
+    spec: #specification for the pod
+      containers:
+      - name: happy
+        image: aaugusto11/happy:amd64
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 4000
+        readinessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /happy/healthz
+            port: 4000
+            scheme: HTTP
+          initialDelaySeconds: 5
+          periodSeconds: 10
+          successThreshold: 1
+          timeoutSeconds: 1
+        livenessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /happy/healthz
+            port: 4000
+            scheme: HTTP
+          initialDelaySeconds: 5
+          periodSeconds: 10
+          successThreshold: 1
+          timeoutSeconds: 1  
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: happy-service
+spec:
+  selector:
+    app: happy
+  ports:
+  - port: 4000
+    targetPort: 4000
+    protocol: TCP
